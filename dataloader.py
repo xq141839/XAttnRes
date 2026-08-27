@@ -7,12 +7,11 @@ Layout expected (created by preprocess.py):
     <preproc_root>/Tr/manifest.json                   {case_id: [slice_idx, ...]}
 
 Splits (which case IDs go to train vs val) come from nnU-Net's splits_final.json so the
-baseline cross-validation matches the user's nnU-Net training. We then expand each case
-into all of its foreground slices via the manifest.
+baseline cross-validation matches the nnU-Net training. We then expand each case into all
+of its foreground slices via the manifest.
 
 Augmentations are classic Albumentations (HFlip / VFlip / rotations / intensity tweaks).
-Normalization is ImageNet mean/std on the [0,1] PNG range — standard practice for any
-ImageNet-pretrained backbone.
+Normalization is ImageNet mean/std on the [0,1] PNG range.
 """
 
 import os
@@ -101,11 +100,6 @@ class AMOS2DPNGDataset(Dataset):
                  preproc_split_dir: str,
                  sample_ids: Sequence[str],
                  transform=None):
-        """
-        preproc_split_dir: path like ".../preprocessed_2d/Tr"
-        sample_ids:        list of "amos_<id>_slice<NNN>" strings (from expand_cases_to_slices)
-        transform:         an Albumentations transform; if None, build_val_transform() is used.
-        """
         self.images_dir = Path(preproc_split_dir) / "images"
         self.labels_dir = Path(preproc_split_dir) / "labels"
         self.sample_ids = list(sample_ids)
@@ -116,10 +110,10 @@ class AMOS2DPNGDataset(Dataset):
 
     def __getitem__(self, idx):
         sid = self.sample_ids[idx]
-        img = np.array(Image.open(self.images_dir / f"{sid}.png").convert('RGB'))   # (H, W, 3) uint8
-        lbl = np.array(Image.open(self.labels_dir / f"{sid}.png"))                  # (H, W)    uint8
+        img = np.array(Image.open(self.images_dir / f"{sid}.png").convert('RGB'))
+        lbl = np.array(Image.open(self.labels_dir / f"{sid}.png"))
 
         out = self.transform(image=img, mask=lbl)
-        image = out['image']                          # (3, H, W) float, ImageNet-normalized
-        label = out['mask'].long()                    # (H, W) long
+        image = out['image']
+        label = out['mask'].long()
         return image, label, sid
