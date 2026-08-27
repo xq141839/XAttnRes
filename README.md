@@ -5,7 +5,7 @@ Official implementation of **"XAttnRes: Cross-Attention Residuals for Block-Leve
 ## Overview
 
 <p align="center">
-  <img src="framework.png" width="90%">
+  <img src="framework.jpg" width="90%">
 </p>
 
 Existing encoder–decoder segmentation networks route information at the **stage level**: each stage exposes only its final block output while discarding intermediate block histories. XAttnRes refines this routing granularity to the **block level** through three complementary modules:
